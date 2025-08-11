@@ -22,6 +22,7 @@ import numpy as np
 from numpy import ndarray
 from scipy import sparse
 from scipy.sparse import spmatrix
+from scipy.sparse import csr_matrix
 
 # Local modules
 from .pyOpt_types import ArrayType
@@ -378,14 +379,19 @@ def convertToDense(mat: Union[dict, spmatrix, ndarray]) -> ndarray:
     """
 
     mat = convertToCSR(mat)
-    newMat = np.zeros(mat["shape"])
+    # newMat = np.zeros(mat["shape"])
+    # data = mat["csr"][IDATA]
+    # colInd = mat["csr"][ICOLIND]
+    # rowp = mat["csr"][IROWP]
+    # for i in range(mat["shape"][0]):
+    #     for j in range(rowp[i], rowp[i + 1]):
+    #         newMat[i, colInd[j]] = data[j]
+    # return newMat
     data = mat["csr"][IDATA]
     colInd = mat["csr"][ICOLIND]
     rowp = mat["csr"][IROWP]
-    for i in range(mat["shape"][0]):
-        for j in range(rowp[i], rowp[i + 1]):
-            newMat[i, colInd[j]] = data[j]
-    return newMat
+    csr = csr_matrix((data, colInd, rowp), shape=mat["shape"])
+    return csr.toarray()
 
 
 def scaleColumns(mat: dict, factor):
